@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>문서 변환 & 검색</title>
+
+  <!-- 스타일 -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- DOCX/PDF 텍스트 미리보기용 라이브러리 -->
+  <script src="https://unpkg.com/mammoth/mammoth.browser.min.js" defer></script>
+  <script src="https://unpkg.com/pdfjs-dist@3.11.174/legacy/build/pdf.min.js" defer></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = null;
+    });
+  </script>
+
+  <!-- (A) 마크다운/보안 렌더러 추가 -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>문서 변환 & 검색</h1>
+      <p class="lead">문서를 변환하면 카테고리별로 정리되고, 선택한 문서만 컨텍스트로 검색(챗봇)해요.</p>
+      <div class="tabs" role="tablist">
+        <a href="#transform" id="tab-transform" class="tab active" role="tab" aria-selected="true">문서 변환</a>
+        <a href="#search" id="tab-search" class="tab" role="tab" aria-selected="false">검색(챗봇)</a>
+      </div>
+    </header>
+
+    <main>
+      <!-- 변환 탭 -->
+      <section id="page-transform" class="card" role="tabpanel" aria-labelledby="tab-transform">
+        <div class="grid">
+          <div>
+            <h2>문서 입력</h2>
+            <div class="row">
+              <label for="file">파일 업로드</label>
+              <input id="file" type="file" accept=".txt,.md,.json,.csv,.docx,.pdf" />
+            </div>
+            <div style="margin-top:8px">
+              <textarea id="src" placeholder="텍스트를 입력하세요"></textarea>
+            </div>
+            <div class="row" style="margin-top:10px">
+              <button id="btnTransform" class="btn" disabled>변환</button>
+              <button id="btnResetInput" class="btn ghost" type="button">입력 초기화</button>
+              <span id="status" class="hint" aria-live="polite"></span>
+            </div>
+          </div>
+
+          <div>
+            <h2>변환된 문서</h2>
+            <!-- (B) pre → div 로 교체 -->
+            <div id="result" class="viewer md" aria-label="변환된 문서"></div>
+            <div class="row right" style="margin-top:10px">
+              <button id="btnCopy" class="btn ghost">결과 복사</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 검색 탭 -->
+      <section id="page-search" class="card" role="tabpanel" aria-labelledby="tab-search" hidden>
+        <div class="search-grid">
+          <div class="cats-card">
+            <h2 style="margin-bottom:10px">카테고리 & 문서 선택</h2>
+            <div id="cats"></div>
+            <div class="selected-info" id="selectedInfo">선택된 문서: 0개</div>
+          </div>
+
+          <div>
+            <h2 style="margin-bottom:10px">검색(챗봇)</h2>
+            <div class="chatcard">
+              <div class="hint">선택한 파일들 중심으로 질문합니다.</div>
+              <div id="chatHistory" class="history" role="log" aria-live="polite"></div>
+              <form id="chatForm" class="toolbar" autocomplete="off">
+                <input id="chatInput" type="text" placeholder="예) 김성현 인사정보 요약해줘" />
+                <button class="btn" type="submit">보내기</button>
+              </form>
+            </div>
+            <!-- ✅ (이 아래를 새로 추가하세요) -->
+            <div class="row" style="margin-top:16px">
+              <button class="btn ghost" type="button" onclick="loadExampleData('HR_INFO')">
+                참고 데이터 보기
+              </button>
+            </div>
+            <div id="exampleContainer" class="viewer md" style="margin-top:10px;"></div>
+            <!-- ✅ 추가 끝 -->
+
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
